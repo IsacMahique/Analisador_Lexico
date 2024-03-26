@@ -3,6 +3,7 @@ package compiller;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import tela.telaCompilador;
 
 public class Simbolos {
     
@@ -41,7 +42,7 @@ public class Simbolos {
         digit.add("5"); digit.add("6"); digit.add("7"); digit.add("8"); digit.add("9");
         
         //vamos adicionar os simbolos especiais que pertecem na lista 'specialSymbol'
-        specialSymbol.add("|");specialSymbol.add(":="); 
+        specialSymbol.add(":="); 
         specialSymbol.add("."); specialSymbol.add(","); 
         specialSymbol.add(";"); specialSymbol.add(":"); 
         specialSymbol.add(".."); specialSymbol.add("and");
@@ -55,7 +56,9 @@ public class Simbolos {
         specialSymbol.add("function"); specialSymbol.add("procedure");
         specialSymbol.add("true"); specialSymbol.add("false");
         specialSymbol.add("char"); specialSymbol.add("integer");
-        specialSymbol.add("boolean");
+        specialSymbol.add("boolean"); specialSymbol.add("(");
+        specialSymbol.add(")"); specialSymbol.add("[");
+        specialSymbol.add("]");
         
         relational_operator.add("=");  relational_operator.add("<>");
         relational_operator.add("<");  relational_operator.add("<=");

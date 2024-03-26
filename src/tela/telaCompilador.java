@@ -13,9 +13,13 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 
 /**
@@ -38,56 +42,69 @@ public class telaCompilador extends javax.swing.JFrame {
         tabela.setRowCount(0);
         //crindo arrayList para receber os dados passados por parametro
         ArrayList<Token> dados = dado;
+        
+        //variaveis
+        int ponteiro1=0;
+        String palavra="";
+        String erro="";
+        
         //preenchendo a tabela com os simbolos e seus estados (existe(simbolo) ou nao existe(error))
         for(int i=0; i<dados.size(); i++){
             Object t[] = {dados.get(i).getToken(), dados.get(i).getEstado()};
             tabela.addRow(t);
-            
             if(dados.get(i).getEstado().equals("erro")){
-                
-                String palavra=dados.get(i).getToken();
-                int ponteiro1=0;
-                String erro="";
-                
-                for (int a = 0; i <= jtaCodigoFonte.getText().length(); i++){
-                    if (a == jtaCodigoFonte.getText().length() || jtaCodigoFonte.getText().charAt(a) == ' ') {
-                        for (int j = ponteiro1; j < i; j++) {               
-                            erro += jtaCodigoFonte.getText().charAt(j);
-                        }
-                        if(erro.equals(palavra)){
-                            pintarLinha(ponteiro1);
-                            
-                            palavra="";;
-                            ponteiro1=a+1;
-                            erro="";
-                        }
-                        
-                    }    
-                }
-                
+                pintarPalavra(dados.get(i).getToken());
             }
+            
         }
     }
         
-    public void pintarLinha(int posicaoCursor) {
+       public static void pintarPalavra(String palavra) {
         try {
             Highlighter highlighter = jtaCodigoFonte.getHighlighter();
             highlighter.removeAllHighlights(); // Remove todos os destaques existentes
-            
-            int numeroLinha = jtaCodigoFonte.getLineOfOffset(posicaoCursor); // Obtém o número da linha em que o cursor está
-            
-            int inicioLinha = jtaCodigoFonte.getLineStartOffset(numeroLinha); // Obtém o início da linha
-            int fimLinha = jtaCodigoFonte.getLineEndOffset(numeroLinha); // Obtém o fim da linha
-            
-            // Pinta toda a linha de vermelho
-            highlighter.addHighlight(inicioLinha, fimLinha, 
-                new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
-        } catch (Exception e) {
+
+            String texto = jtaCodigoFonte.getText();
+            int inicioPalavra = texto.indexOf(palavra); // Encontra a posição da palavra
+
+            while (inicioPalavra >= 0) {
+                int numeroLinha = jtaCodigoFonte.getLineOfOffset(inicioPalavra); // Obtém o número da linha em que a palavra está
+                int inicioLinha = jtaCodigoFonte.getLineStartOffset(numeroLinha); // Obtém o início da linha
+                int fimLinha = jtaCodigoFonte.getLineEndOffset(numeroLinha); // Obtém o fim da linha
+
+                // Pinta toda a linha de vermelho
+                highlighter.addHighlight(inicioLinha, fimLinha,
+                        new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
+
+                inicioPalavra = texto.indexOf(palavra, fimLinha); // Procura pela próxima ocorrência da palavra
+            }
+
+            // Desativa a funcionalidade de pintura enquanto digitamos
+            Document document = jtaCodigoFonte.getDocument();
+            document.addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    removerPintura();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    removerPintura();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    removerPintura();
+                }
+
+                private void removerPintura() {
+                    highlighter.removeAllHighlights();
+                }
+            });
+        } catch (BadLocationException e) {
             e.printStackTrace();
         }
-    }
-       
-    /**
+    }    /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
@@ -322,6 +339,6 @@ public class telaCompilador extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jtSaida;
-    private javax.swing.JTextArea jtaCodigoFonte;
+    public static javax.swing.JTextArea jtaCodigoFonte;
     // End of variables declaration//GEN-END:variables
 }
